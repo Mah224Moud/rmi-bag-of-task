@@ -6,76 +6,42 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class TaskResultsRepository {
 
-    public void saveResult(String taskName, int param, int result) {
-        String sql = "INSERT INTO TASK_RESULTS (TASK_NAME, PARAM, RESULT) VALUES (?, ?, ?)";
-        try (Connection conn = DatabaseHelper.connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+    public int saveResult(String taskName, int param) {
+        String sql = "INSERT INTO TASK_RESULTS (TASK_NAME, PARAM, DATE_CREATED) VALUES (?, ?, CURRENT_TIMESTAMP)";
+        try (Connection conn = DatabaseHelper.connectToEluard();
+                PreparedStatement pstmt = conn.prepareStatement(sql, new String[] { "ID" })) {
             pstmt.setString(1, taskName);
             pstmt.setInt(2, param);
-            pstmt.setInt(3, result);
             pstmt.executeUpdate();
-            System.out.println("Result saved in database.");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
 
-    public String getResultById(int id) {
-        String sql = "SELECT TASK_NAME, PARAM, RESULT, CREATED_AT FROM TASK_RESULTS WHERE ID = ?";
-        try (Connection conn = DatabaseHelper.connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, id);
-            ResultSet rs = pstmt.executeQuery();
+            ResultSet rs = pstmt.getGeneratedKeys();
             if (rs.next()) {
-                String taskName = rs.getString("TASK_NAME");
-                int param = rs.getInt("PARAM");
-                int result = rs.getInt("RESULT");
-                String createdAt = rs.getTimestamp("CREATED_AT").toString();
-
-                return "Task: " + taskName + " | " + param + "ème nombre de Fibonacci est " + result +
-                        " | Executed on: " + createdAt;
+                int taskId = rs.getInt(1);
+                System.out.println("Result saved in eluard with taskId: " + taskId);
+                return taskId;
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return "No result found for ID: " + id;
+        return -1;
     }
 
-    public void updateResult(int id, int newResult) {
-        String sql = "UPDATE TASK_RESULTS SET RESULT = ? WHERE ID = ?";
-        try (Connection conn = DatabaseHelper.connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, newResult);
-            pstmt.setInt(2, id);
+    public void saveFibonacciSequence(int taskId, List<Integer> sequence) {
+        String sequenceString = sequence.stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining(","));
+        String sql = "INSERT INTO FIBONACCI_SEQUENCE (ID, RESULT) VALUES (?, ?)";
+        try (Connection conn = DatabaseHelper.connectToButor(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, taskId);
+            pstmt.setString(2, sequenceString);
             pstmt.executeUpdate();
-            System.out.println("Result updated in database.");
+            System.out.println("Fibonacci sequence saved in butor for taskId: " + taskId);
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-
-    public void deleteResult(int id) {
-        String sql = "DELETE FROM TASK_RESULTS WHERE ID = ?";
-        try (Connection conn = DatabaseHelper.connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, id);
-            pstmt.executeUpdate();
-            System.out.println("Result deleted from database.");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public List<Integer> listAllIds() {
-        List<Integer> ids = new ArrayList<>();
-        String sql = "SELECT ID FROM TASK_RESULTS";
-        try (Connection conn = DatabaseHelper.connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-                ids.add(rs.getInt("ID"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return ids;
     }
 }

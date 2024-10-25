@@ -7,9 +7,11 @@ import java.util.ArrayList;
 
 public class FibonacciTask implements Task {
     private int n;
+    private String description;
 
     public FibonacciTask(int n) {
         this.n = n;
+        this.description = "Calcul des " + n + " premiers nombres de Fibonacci";
     }
 
     @Override
@@ -38,5 +40,13 @@ public class FibonacciTask implements Task {
 
     public int getParam() {
         return this.n;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return this.description;
     }
 }
