@@ -33,8 +33,11 @@ public class Server extends UnicastRemoteObject implements TaskManager {
                 System.out.println("Worker " + Thread.currentThread().getId() + " started processing a task");
                 Result result = worker.executeTask(task);
 
-                taskRepository.saveResult(task.getClass().getSimpleName(), ((FibonacciTask) task).getParam(),
-                        result.getResult());
+                /*
+                 * taskRepository.saveResult(task.getClass().getSimpleName(), ((FibonacciTask)
+                 * task).getParam(),
+                 * result.getResult());
+                 */
 
                 callback.notify(result);
                 System.out.println("Worker " + Thread.currentThread().getId() + " finished processing a task");

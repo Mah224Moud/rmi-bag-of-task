@@ -1,20 +1,21 @@
 package interfaces;
 
 import java.io.Serializable;
+import java.util.List;;
 
 public class Result implements Serializable {
-    private int result;
+    private List<Integer> fiboSequence;
 
-    public Result(int result) {
-        this.result = result;
+    public Result(List<Integer> fiboSequence) {
+        this.fiboSequence = fiboSequence;
     }
 
-    public int getResult() {
-        return result;
+    public List<Integer> getFibonacciSequence() {
+        return fiboSequence;
     }
 
     @Override
     public String toString() {
-        return "Result: " + result;
+        return "Result: " + fiboSequence;
     }
 }
