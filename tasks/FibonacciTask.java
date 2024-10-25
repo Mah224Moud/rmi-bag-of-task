@@ -22,4 +22,8 @@ public class FibonacciTask implements Task {
             return n;
         return calculate(n - 1) + calculate(n - 2);
     }
+
+    public int getParam() {
+        return this.n;
+    }
 }

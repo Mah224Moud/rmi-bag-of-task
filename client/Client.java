@@ -14,7 +14,7 @@ public class Client {
 
             TaskManager taskManager = (TaskManager) registry.lookup("TaskManager");
 
-            Task task = new FibonacciTask(10);
+            Task task = new FibonacciTask(9);
             taskManager.submitTask(task, new CallbackImpl());
         } catch (Exception e) {
             e.printStackTrace();
