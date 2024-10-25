@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TaskResultsRepository {
 
@@ -61,5 +63,19 @@ public class TaskResultsRepository {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public List<Integer> listAllIds() {
+        List<Integer> ids = new ArrayList<>();
+        String sql = "SELECT ID FROM TASK_RESULTS";
+        try (Connection conn = DatabaseHelper.connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                ids.add(rs.getInt("ID"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return ids;
     }
 }

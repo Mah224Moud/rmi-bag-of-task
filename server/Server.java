@@ -2,6 +2,7 @@ package server;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -44,7 +45,28 @@ public class Server extends UnicastRemoteObject implements TaskManager {
         });
     }
 
+    public String getResultDetails(int id) throws RemoteException {
+        return taskRepository.getResultById(id);
+    }
+
+    public void updateResult(int id, int newResult) throws RemoteException {
+        taskRepository.updateResult(id, newResult);
+        System.out.println("Result updated for ID: " + id);
+    }
+
+    public void deleteResult(int id) throws RemoteException {
+        taskRepository.deleteResult(id);
+        System.out.println("Result deleted for ID: " + id);
+    }
+
     public void shutdown() {
         workerPool.shutdown();
     }
+
+    /*
+     * @Override
+     * public List<Integer> listAllIds() {
+     * return this.taskRepository.listAllIds();
+     * }
+     */
 }
