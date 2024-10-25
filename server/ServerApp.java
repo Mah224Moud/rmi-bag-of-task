@@ -11,6 +11,8 @@ public class ServerApp {
             registry.rebind("TaskManager", server);
 
             System.out.println("Server is running...");
+
+            Runtime.getRuntime().addShutdownHook(new Thread(server::shutdown));
         } catch (Exception e) {
             e.printStackTrace();
         }

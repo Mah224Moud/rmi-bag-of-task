@@ -2,8 +2,6 @@ package tasks;
 
 import interfaces.Task;
 
-import java.io.Serializable;
-
 import interfaces.Result;
 
 public class FibonacciTask implements Task {
