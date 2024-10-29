@@ -33,9 +33,6 @@ public class Client {
                 scanner.nextLine();
 
                 running = handleChoice(choice);
-
-                String resultDetails = server.getResultDetails(1);
-                System.out.println("\n\nFetched Result: " + resultDetails);
             }
 
             scanner.close();

@@ -10,12 +10,13 @@ import java.util.stream.Collectors;
 
 public class TaskResultsRepository {
 
-    public int saveResult(String taskName, int param) {
-        String sql = "INSERT INTO TASK_RESULTS (TASK_NAME, PARAM, DATE_CREATED) VALUES (?, ?, CURRENT_TIMESTAMP)";
+    public int saveResult(String taskName, int param, String description) {
+        String sql = "INSERT INTO TASK_RESULTS (TASK_NAME, PARAM, DESCRIPTION, DATE_CREATED) VALUES (?, ?, ?, CURRENT_TIMESTAMP)";
         try (Connection conn = DatabaseHelper.connectToEluard();
                 PreparedStatement pstmt = conn.prepareStatement(sql, new String[] { "ID" })) {
             pstmt.setString(1, taskName);
             pstmt.setInt(2, param);
+            pstmt.setString(3, description);
             pstmt.executeUpdate();
 
             ResultSet rs = pstmt.getGeneratedKeys();

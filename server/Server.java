@@ -31,45 +31,45 @@ public class Server extends UnicastRemoteObject implements TaskManager {
             try {
                 Worker worker = new Worker();
                 System.out.println("Worker " + Thread.currentThread().getId() + " started processing a task");
-                Result result = worker.executeTask(task);
 
-                /*
-                 * taskRepository.saveResult(task.getClass().getSimpleName(), ((FibonacciTask)
-                 * task).getParam(),
-                 * result.getResult());
-                 */
+                Result result = worker.executeTask(task);
+                List<Integer> fibonacciSequence = result.getFibonacciSequence();
+
+                int param = ((FibonacciTask) task).getParam();
+                String description = ((FibonacciTask) task).getDescription();
+                int taskId = taskRepository.saveResult(task.getClass().getSimpleName(), param, description);
+
+                taskRepository.saveFibonacciSequence(taskId, fibonacciSequence);
 
                 callback.notify(result);
-                System.out.println("Worker " + Thread.currentThread().getId() + " finished processing a task");
-
+                System.out.println("The client is been notified !!!");
+                System.out.println("Worker " + Thread.currentThread().getId() + " finished processing a task\n\n");
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
     }
 
-    public String getResultDetails(int id) throws RemoteException {
-        return taskRepository.getResultById(id);
-    }
-
-    public void updateResult(int id, int newResult) throws RemoteException {
-        taskRepository.updateResult(id, newResult);
-        System.out.println("Result updated for ID: " + id);
-    }
-
-    public void deleteResult(int id) throws RemoteException {
-        taskRepository.deleteResult(id);
-        System.out.println("Result deleted for ID: " + id);
-    }
-
     public void shutdown() {
         workerPool.shutdown();
+        System.out.println("Server is shutting down...");
     }
 
-    /*
-     * @Override
-     * public List<Integer> listAllIds() {
-     * return this.taskRepository.listAllIds();
-     * }
-     */
+    @Override
+    public String getResultDetails(int id) throws RemoteException {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getResultDetails'");
+    }
+
+    @Override
+    public void updateResult(int id, int newResult) throws RemoteException {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'updateResult'");
+    }
+
+    @Override
+    public void deleteResult(int id) throws RemoteException {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'deleteResult'");
+    }
 }
