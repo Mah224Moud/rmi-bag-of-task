@@ -14,12 +14,31 @@ public class FibonacciTask implements Task {
         this.description = "Calcul des " + n + " premiers nombres de Fibonacci";
     }
 
+    /**
+     * Executes the task and returns the result.
+     * 
+     * This method computes the Fibonacci sequence for the parameter 'n'
+     * and returns the result as a list of integers.
+     * 
+     * @return a list of integers representing the Fibonacci sequence
+     */
     @Override
     public Result execute() {
         List<Integer> fiboSequence = calculate(n);
         return new Result(fiboSequence);
     }
 
+    /**
+     * Computes the Fibonacci sequence up to the nth number.
+     * 
+     * This method takes an integer 'n' as parameter and returns
+     * a list of integers representing the Fibonacci sequence
+     * up to the nth number. If 'n' is less than or equal to 0,
+     * the method returns an empty list.
+     * 
+     * @param n the number of elements in the Fibonacci sequence
+     * @return a list of integers representing the Fibonacci sequence
+     */
     private List<Integer> calculate(int n) {
         List<Integer> sequence = new ArrayList<>();
 
@@ -38,14 +57,27 @@ public class FibonacciTask implements Task {
         return sequence;
     }
 
+    /**
+     * Retrieves the parameter associated with the task.
+     * 
+     * This method returns the parameter 'n' associated with the Fibonacci
+     * task, which is the number of elements in the Fibonacci sequence to
+     * be computed.
+     * 
+     * @return the parameter associated with the task
+     */
     public int getParam() {
         return this.n;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
+    /**
+     * Retrieves the description associated with the task.
+     * 
+     * This method returns the description associated with the Fibonacci
+     * task, which is a string that describes the task.
+     * 
+     * @return the description associated with the task
+     */
     public String getDescription() {
         return this.description;
     }

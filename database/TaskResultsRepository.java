@@ -10,6 +10,14 @@ import java.util.stream.Collectors;
 
 public class TaskResultsRepository {
 
+    /**
+     * Save a result in the database.
+     * 
+     * @param taskName    the name of the task
+     * @param param       the parameter used for the task
+     * @param description a short description of the task
+     * @return the ID of the result in the database, or -1 if the operation failed.
+     */
     public int saveResult(String taskName, int param, String description) {
         String sql = "INSERT INTO TASK_RESULTS (TASK_NAME, PARAM, DESCRIPTION, DATE_CREATED) VALUES (?, ?, ?, CURRENT_TIMESTAMP)";
         try (Connection conn = DatabaseHelper.connectToEluard();
@@ -31,6 +39,12 @@ public class TaskResultsRepository {
         return -1;
     }
 
+    /**
+     * Save a Fibonacci sequence in the database.
+     * 
+     * @param taskId   the ID of the task in the database
+     * @param sequence the Fibonacci sequence to be saved
+     */
     public void saveFibonacciSequence(int taskId, List<Integer> sequence) {
         String sequenceString = sequence.stream()
                 .map(String::valueOf)
@@ -46,23 +60,12 @@ public class TaskResultsRepository {
         }
     }
 
-    public List<Integer> getAllTaskIds() {
-        List<Integer> ids = new ArrayList<>();
-
-        String sql = "SELECT ID FROM TASK_RESULTS";
-        try (Connection conn = DatabaseHelper.connectToEluard();
-                PreparedStatement pstmt = conn.prepareStatement(sql);
-                ResultSet rs = pstmt.executeQuery()) {
-            while (rs.next()) {
-                ids.add(rs.getInt("ID"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return ids;
-    }
-
+    /**
+     * Checks if a parameter is already in the database.
+     * 
+     * @param param the parameter to check
+     * @return true if the parameter exists, false otherwise
+     */
     public boolean isParamExists(int param) {
         String sql = "SELECT COUNT(*) FROM TASK_RESULTS WHERE PARAM = ?";
         try (Connection conn = DatabaseHelper.connectToEluard();
@@ -80,6 +83,19 @@ public class TaskResultsRepository {
         return false;
     }
 
+    /**
+     * Updates the result associated with the specified old parameter in the
+     * database.
+     * 
+     * This method updates both the parameter and the Fibonacci sequence result
+     * for the entry identified by the old parameter. It first retrieves the
+     * task ID using the old parameter, and if found, updates the parameter
+     * and the sequence in the respective tables.
+     * 
+     * @param oldParam   the existing parameter to identify the record to update
+     * @param newParam   the new parameter value to update in the record
+     * @param newResults the new Fibonacci sequence to update in the record
+     */
     public void updateResultByParam(int oldParam, int newParam, List<Integer> newResults) {
         String sqlGetId = "SELECT ID FROM TASK_RESULTS WHERE PARAM = ?";
         int taskId = -1;
@@ -126,6 +142,11 @@ public class TaskResultsRepository {
         }
     }
 
+    /**
+     * Retrieves all parameters stored in the TASK_RESULTS table.
+     *
+     * @return a list of all parameters from the TASK_RESULTS table
+     */
     public List<Integer> getAllParams() {
         List<Integer> params = new ArrayList<>();
         String sql = "SELECT PARAM FROM TASK_RESULTS";
@@ -143,6 +164,16 @@ public class TaskResultsRepository {
         return params;
     }
 
+    /**
+     * Deletes the result associated with the specified parameter in the database.
+     * 
+     * This method deletes both the parameter and the Fibonacci sequence result
+     * for the entry identified by the parameter. It first retrieves the
+     * task ID using the parameter, and if found, deletes the parameter
+     * and the sequence in the respective tables.
+     * 
+     * @param param the parameter to identify the record to delete
+     */
     public void deleteResultByParam(int param) {
         String sqlGetId = "SELECT ID FROM TASK_RESULTS WHERE PARAM = ?";
         int taskId = -1;
@@ -183,12 +214,35 @@ public class TaskResultsRepository {
         }
     }
 
+    /**
+     * Retrieves the complete task information associated with the specified
+     * parameter.
+     * 
+     * This method retrieves both the task information and the Fibonacci sequence
+     * result for the entry identified by the parameter. It first retrieves the
+     * task ID using the parameter, and if found, retrieves the parameter
+     * and the sequence in the respective tables.
+     * 
+     * @param param the parameter to identify the record to retrieve
+     * @return a string containing the task information and the Fibonacci sequence
+     */
     public String getCompleteTaskInfoByParam(int param) {
         String taskInfo = getResultByParam(param);
         String sequenceInfo = getFibonacciSequenceByParam(param);
         return taskInfo + " ==> La suite de Fibonacci: " + sequenceInfo;
     }
 
+    /**
+     * Retrieves the Fibonacci sequence associated with the specified parameter.
+     * 
+     * This method retrieves the task ID associated with the parameter and
+     * then retrieves the Fibonacci sequence from the FIBONACCI_SEQUENCE
+     * table for the found ID. If either the task ID or the sequence is not
+     * found, the method returns a descriptive error string.
+     * 
+     * @param param the parameter to identify the record to retrieve
+     * @return a string containing the Fibonacci sequence, or an error string
+     */
     private String getFibonacciSequenceByParam(int param) {
         String sqlGetId = "SELECT ID FROM TASK_RESULTS WHERE PARAM = ?";
         int taskId = -1;
@@ -223,6 +277,18 @@ public class TaskResultsRepository {
         return "Aucune suite Fibonacci trouvée pour le paramètre: " + param;
     }
 
+    /**
+     * Retrieves the task result associated with the specified parameter.
+     * 
+     * This method queries the TASK_RESULTS table to find the task details
+     * for the given parameter. If a matching entry is found, it returns
+     * a formatted string containing the task name, parameter, and description.
+     * If no entry is found, it returns an error message.
+     * 
+     * @param param the parameter to identify the record to retrieve
+     * @return a string containing the task information, or an error message if not
+     *         found
+     */
     public String getResultByParam(int param) {
         String sql = "SELECT TASK_NAME, PARAM, DESCRIPTION, DATE_CREATED FROM TASK_RESULTS WHERE PARAM = ?";
         try (Connection conn = DatabaseHelper.connectToEluard();

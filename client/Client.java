@@ -36,6 +36,9 @@ public class Client {
         }
     }
 
+    /**
+     * Displays the main menu of the client and waits for user input.
+     */
     private static void displayMenu() {
         System.out.println("\n--- Menu ---");
         System.out.println("1 - Créer une tâche");
@@ -46,6 +49,13 @@ public class Client {
         System.out.print("Choisissez une option : ");
     }
 
+    /**
+     * Handles the user's menu choice.
+     *
+     * @param choice the user's menu choice
+     * @return true if the client should continue running, false if the client
+     *         should exit
+     */
     private static boolean handleChoice(int choice) {
         switch (choice) {
             case 1:
@@ -70,6 +80,11 @@ public class Client {
         return true;
     }
 
+    /**
+     * Asks the user to enter a number and creates a FibonacciTask with
+     * this number. The task is then submitted to the server with a
+     * CallbackImpl as the callback.
+     */
     private static void createTask() {
         System.out.print("Entrez un nombre pour Fibonacci: ");
         int n = scanner.nextInt();
@@ -83,6 +98,13 @@ public class Client {
         }
     }
 
+    /**
+     * Prompts the user to enter a parameter to consult a result.
+     * Lists all the calculated Fibo parameters and checks if the entered
+     * parameter exists. If it exists, requests the server to provide
+     * the result associated with the parameter using a callback.
+     * If the parameter does not exist, notifies the user.
+     */
     private static void consultResult() {
         try {
             List<Integer> params = server.listAllParams();
@@ -102,6 +124,14 @@ public class Client {
         }
     }
 
+    /**
+     * Prompts the user to enter a parameter to update a result.
+     * Lists all the calculated Fibo parameters and checks if the entered
+     * parameter exists. If it exists, requests the server to provide
+     * the result associated with the parameter using a callback.
+     * If the parameter does not exist, notifies the user.
+     * If the update is successful, notifies the user.
+     */
     private static void updateResult() {
         try {
             List<Integer> params = server.listAllParams();
@@ -127,6 +157,14 @@ public class Client {
         }
     }
 
+    /**
+     * Prompts the user to enter a parameter to delete a result.
+     * Lists all the calculated Fibo parameters and checks if the entered
+     * parameter exists. If it exists, requests the server to delete
+     * the result associated with the parameter using a callback.
+     * If the parameter does not exist, notifies the user.
+     * If the deletion is successful, notifies the user.
+     */
     private static void deleteResult() {
         try {
             List<Integer> params = server.listAllParams();

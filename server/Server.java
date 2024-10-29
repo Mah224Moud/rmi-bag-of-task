@@ -25,6 +25,21 @@ public class Server extends UnicastRemoteObject implements TaskManager {
         taskRepository = new TaskResultsRepository();
     }
 
+    /**
+     * Submit a task to the server to be processed by a worker.
+     * 
+     * The task is submitted to a pool of workers, and the result is
+     * returned to the client using the provided callback.
+     * 
+     * The server will prevent duplicate calculations of the same task
+     * by checking if the same parameter has already been calculated in
+     * the database.
+     * 
+     * @param task     the task to be submitted
+     * @param callback the callback that will be notified when the result
+     *                 is available
+     * @throws RemoteException if a network error occurs
+     */
     @Override
     public void submitTask(Task task, Callback callback) throws RemoteException {
         workerPool.submit(() -> {
@@ -57,6 +72,18 @@ public class Server extends UnicastRemoteObject implements TaskManager {
         });
     }
 
+    /**
+     * Updates the result associated with the specified old parameter.
+     * 
+     * If the old parameter does not exist, notifies the client that no
+     * update was made.
+     * 
+     * @param oldParam the existing parameter to identify the record to update
+     * @param task     the task that will be used to generate the new result
+     * @param callback the callback that will be notified when the result
+     *                 is available
+     * @throws RemoteException if a network error occurs
+     */
     @Override
     public void updateResult(int oldParam, Task task, Callback callback) throws RemoteException {
         Worker worker = new Worker();
@@ -73,12 +100,34 @@ public class Server extends UnicastRemoteObject implements TaskManager {
         System.out.println("Worker " + Thread.currentThread().getId() + " finished processing a task\n");
     }
 
+    /**
+     * Deletes the result associated with the specified parameter.
+     * 
+     * If the parameter does not exist, notifies the client that no
+     * deletion was made.
+     * 
+     * @param param    the parameter to identify the record to delete
+     * @param callback the callback that will be notified when the deletion
+     *                 is complete
+     * @throws RemoteException if a network error occurs
+     */
     @Override
     public void deleteResult(int param, Callback callback) throws RemoteException {
         taskRepository.deleteResultByParam(param);
         callback.alert("Le résultat avec le paramètre " + param + " a été supprimé.");
     }
 
+    /**
+     * Retrieves the complete task information associated with the specified
+     * parameter.
+     * 
+     * If the parameter does not exist, notifies the client that no result
+     * was found.
+     * 
+     * @param param    the parameter to identify the record to retrieve
+     * @param callback the callback that will be notified with the result
+     * @throws RemoteException if a network error occurs
+     */
     @Override
     public void getResultByParam(int param, Callback callback) throws RemoteException {
         if (!taskRepository.isParamExists(param)) {
@@ -91,14 +140,27 @@ public class Server extends UnicastRemoteObject implements TaskManager {
         System.out.println("Le client a été notifié !!!");
     }
 
-    public void shutdown() {
-        workerPool.shutdown();
-        System.out.println("Server is shutting down...");
-    }
-
+    /**
+     * Retrieves all parameters stored in the database.
+     * 
+     * @return a list of all parameters from the database
+     * @throws RemoteException if a network error occurs
+     */
     @Override
     public List<Integer> listAllParams() throws RemoteException {
         return taskRepository.getAllParams();
+    }
+
+    /**
+     * Shuts down the server gracefully by terminating the worker pool.
+     * 
+     * This method ensures that all running tasks are completed before
+     * shutting down the server. It also logs a message indicating that
+     * the server is shutting down.
+     */
+    public void shutdown() {
+        workerPool.shutdown();
+        System.out.println("Server is shutting down...");
     }
 
 }
