@@ -19,11 +19,6 @@ public class Client {
             Registry registry = LocateRegistry.getRegistry("localhost", 1099);
             server = (TaskManager) registry.lookup("TaskManager");
 
-            /*
-             * Task task = new FibonacciTask(5);
-             * server.submitTask(task, new CallbackImpl());
-             */
-
             scanner = new Scanner(System.in);
             boolean running = true;
 
@@ -128,10 +123,19 @@ public class Client {
 
     private static void deleteResult() {
         try {
-            System.out.print("Entrez l'ID du résultat à supprimer : ");
-            int idToDelete = scanner.nextInt();
-            server.deleteResult(idToDelete);
-            System.out.println("Résultat supprimé pour ID : " + idToDelete);
+            List<Integer> params = server.listAllParams();
+            System.out.println("Paramètres calculés : " + params);
+
+            System.out.print("Entrez le paramètre à supprimer : ");
+            int param = scanner.nextInt();
+
+            if (!params.contains(param)) {
+                System.out.println("Le paramètre " + param + " n'existe pas.");
+                return;
+            }
+
+            server.deleteResult(param, new CallbackImpl());
+            System.out.println("Tâche soumise pour suppression du paramètre: " + param);
         } catch (Exception e) {
             System.out.println("Erreur lors de la suppression du résultat.");
             e.printStackTrace();

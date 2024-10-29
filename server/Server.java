@@ -97,4 +97,12 @@ public class Server extends UnicastRemoteObject implements TaskManager {
     public List<Integer> listAllParams() throws RemoteException {
         return taskRepository.getAllParams();
     }
+
+    @Override
+    public void deleteResult(int param, Callback callback) throws RemoteException {
+        // Appeler le repository pour supprimer les résultats
+        taskRepository.deleteResultByParam(param);
+        callback.alert("Le résultat avec le paramètre " + param + " a été supprimé.");
+    }
+
 }

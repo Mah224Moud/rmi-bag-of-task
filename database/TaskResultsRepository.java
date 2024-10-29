@@ -200,4 +200,47 @@ public class TaskResultsRepository {
         return params;
     }
 
+    public void deleteResultByParam(int param) {
+        // Récupérer l'ID du paramètre à supprimer
+        String sqlGetId = "SELECT ID FROM TASK_RESULTS WHERE PARAM = ?";
+        int taskId = -1;
+
+        try (Connection conn = DatabaseHelper.connectToEluard();
+                PreparedStatement pstmt = conn.prepareStatement(sqlGetId)) {
+            pstmt.setInt(1, param);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                taskId = rs.getInt("ID");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // Supprimer le résultat dans butor
+        if (taskId != -1) {
+            String sqlDeleteButor = "DELETE FROM FIBONACCI_SEQUENCE WHERE ID = ?";
+            try (Connection conn = DatabaseHelper.connectToButor();
+                    PreparedStatement pstmt = conn.prepareStatement(sqlDeleteButor)) {
+                pstmt.setInt(1, taskId);
+                pstmt.executeUpdate();
+                System.out.println("La suite de Fibonacci a été supprimée de butor pour ID: " + taskId);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            // Supprimer le résultat dans eluard
+            String sqlDeleteEluard = "DELETE FROM TASK_RESULTS WHERE ID = ?";
+            try (Connection conn = DatabaseHelper.connectToEluard();
+                    PreparedStatement pstmt = conn.prepareStatement(sqlDeleteEluard)) {
+                pstmt.setInt(1, taskId);
+                pstmt.executeUpdate();
+                System.out.println("Le résultat a été supprimé d'eluard pour ID: " + taskId);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("Aucun enregistrement trouvé avec le paramètre: " + param);
+        }
+    }
+
 }
