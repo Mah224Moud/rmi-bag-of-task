@@ -56,6 +56,9 @@ public class Client {
             case 1:
                 createTask();
                 break;
+            case 2:
+                consultResult();
+                break;
             case 3:
                 updateResult();
                 break;
@@ -84,21 +87,19 @@ public class Client {
         }
     }
 
-    /*
-     * private static void consultResult() {
-     * try {
-     * List<Integer> ids = server.listAllIds();
-     * System.out.println("IDs disponibles : " + ids);
-     * System.out.print("Entrez l'ID du résultat à consulter : ");
-     * int idToFetch = scanner.nextInt();
-     * String resultDetails = server.getResultDetails(idToFetch);
-     * System.out.println("Résultat récupéré : " + resultDetails);
-     * } catch (Exception e) {
-     * System.out.println("Erreur lors de la consultation du résultat.");
-     * e.printStackTrace();
-     * }
-     * }
-     */
+    private static void consultResult() {
+        try {
+            List<Integer> ids = server.listAllIds();
+            System.out.println("IDs disponibles : " + ids);
+            System.out.print("Entrez l'ID du résultat à consulter : ");
+            int id = scanner.nextInt();
+            String resultDetails = server.getResultDetails(id);
+            System.out.println(resultDetails);
+        } catch (Exception e) {
+            System.out.println("Erreur lors de la consultation du résultat.");
+            e.printStackTrace();
+        }
+    }
 
     private static void updateResult() {
         try {

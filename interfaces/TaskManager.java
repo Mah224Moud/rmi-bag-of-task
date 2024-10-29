@@ -13,5 +13,5 @@ public interface TaskManager extends Remote {
 
     void deleteResult(int id) throws RemoteException;
 
-    /* List<Integer> listAllIds(); */
+    List<Integer> listAllIds() throws RemoteException;
 }

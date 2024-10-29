@@ -57,8 +57,7 @@ public class Server extends UnicastRemoteObject implements TaskManager {
 
     @Override
     public String getResultDetails(int id) throws RemoteException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getResultDetails'");
+        return taskRepository.getCompleteTaskInfoById(id);
     }
 
     @Override
@@ -71,5 +70,10 @@ public class Server extends UnicastRemoteObject implements TaskManager {
     public void deleteResult(int id) throws RemoteException {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'deleteResult'");
+    }
+
+    @Override
+    public List<Integer> listAllIds() throws RemoteException {
+        return taskRepository.getAllTaskIds();
     }
 }
