@@ -103,12 +103,23 @@ public class Client {
 
     private static void updateResult() {
         try {
-            System.out.print("Entrez l'ID du résultat à mettre à jour : ");
-            int idToUpdate = scanner.nextInt();
-            System.out.print("Entrez le nouveau résultat : ");
-            int newResult = scanner.nextInt();
-            server.updateResult(idToUpdate, newResult);
-            System.out.println("Résultat mis à jour pour ID : " + idToUpdate);
+            List<Integer> params = server.listAllParams();
+            System.out.println("Paramètres calculés : " + params);
+
+            System.out.print("Entrez le paramètre à mettre à jour : ");
+            int oldParam = scanner.nextInt();
+
+            if (!params.contains(oldParam)) {
+                System.out.println("Le paramètre " + oldParam + " n'existe pas.");
+                return;
+            }
+
+            System.out.print("Entrez le nouveau paramètre : ");
+            int newParam = scanner.nextInt();
+            Task task = new FibonacciTask(newParam);
+            server.updateResult(oldParam, task, new CallbackImpl());
+            System.out.println("Tâche soumise pour mise à jour de Fibonacci avec le nouveau paramètre : " + newParam);
+
         } catch (Exception e) {
             System.out.println("Erreur lors de la mise à jour du résultat.");
             e.printStackTrace();
@@ -126,4 +137,5 @@ public class Client {
             e.printStackTrace();
         }
     }
+
 }

@@ -122,4 +122,82 @@ public class TaskResultsRepository {
         return false;
     }
 
+    public void updateResultByParam(int oldParam, int newParam, List<Integer> newResults) {
+        String sqlGetId = "SELECT ID FROM TASK_RESULTS WHERE PARAM = ?";
+        int taskId = -1;
+
+        try (Connection conn = DatabaseHelper.connectToEluard();
+                PreparedStatement pstmt = conn.prepareStatement(sqlGetId)) {
+            pstmt.setInt(1, oldParam);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                taskId = rs.getInt("ID");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        if (taskId != -1) {
+            String sqlUpdateEluard = "UPDATE TASK_RESULTS SET PARAM = ? WHERE ID = ?";
+            try (Connection conn = DatabaseHelper.connectToEluard();
+                    PreparedStatement pstmt = conn.prepareStatement(sqlUpdateEluard)) {
+                pstmt.setInt(1, newParam);
+                pstmt.setInt(2, taskId);
+                pstmt.executeUpdate();
+                System.out.println("Le paramètre a été mis à jour dans eluard pour ID: " + taskId);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            String sequenceString = newResults.stream()
+                    .map(String::valueOf)
+                    .collect(Collectors.joining(","));
+
+            String sqlUpdateButor = "UPDATE FIBONACCI_SEQUENCE SET RESULT = ? WHERE ID = ?";
+            try (Connection conn = DatabaseHelper.connectToButor();
+                    PreparedStatement pstmt = conn.prepareStatement(sqlUpdateButor)) {
+                pstmt.setString(1, sequenceString);
+                pstmt.setInt(2, taskId);
+                pstmt.executeUpdate();
+                System.out.println("La suite de Fibonacci a été mise à jour dans butor pour ID: " + taskId);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("Aucun enregistrement trouvé avec le paramètre: " + oldParam);
+        }
+    }
+
+    public int getTaskIdByParam(int param) {
+        String sql = "SELECT ID FROM TASK_RESULTS WHERE PARAM = ?";
+        try (Connection conn = DatabaseHelper.connectToEluard();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, param);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("ID");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    public List<Integer> getAllParams() {
+        List<Integer> params = new ArrayList<>();
+        String sql = "SELECT PARAM FROM TASK_RESULTS";
+
+        try (Connection conn = DatabaseHelper.connectToEluard();
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                params.add(rs.getInt("PARAM"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return params;
+    }
+
 }

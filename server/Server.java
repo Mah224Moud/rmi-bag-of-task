@@ -57,6 +57,22 @@ public class Server extends UnicastRemoteObject implements TaskManager {
         });
     }
 
+    @Override
+    public void updateResult(int oldParam, Task task, Callback callback) throws RemoteException {
+        Worker worker = new Worker();
+        System.out.println("Worker " + Thread.currentThread().getId() + " started processing a task");
+        Result result = worker.executeTask(task);
+        List<Integer> newResults = result.getFibonacciSequence();
+        if (!taskRepository.isParamExists(oldParam)) {
+            callback.alert("Le paramètre " + oldParam + " n'existe pas. Aucune mise à jour effectuée.");
+            return;
+        }
+        taskRepository.updateResultByParam(oldParam, ((FibonacciTask) task).getParam(), newResults);
+        callback.notify(result);
+
+        System.out.println("Worker " + Thread.currentThread().getId() + " finished processing a task\n");
+    }
+
     public void shutdown() {
         workerPool.shutdown();
         System.out.println("Server is shutting down...");
@@ -68,19 +84,17 @@ public class Server extends UnicastRemoteObject implements TaskManager {
     }
 
     @Override
-    public void updateResult(int id, int newResult) throws RemoteException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateResult'");
-    }
-
-    @Override
     public void deleteResult(int id) throws RemoteException {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'deleteResult'");
     }
 
     @Override
     public List<Integer> listAllIds() throws RemoteException {
         return taskRepository.getAllTaskIds();
+    }
+
+    @Override
+    public List<Integer> listAllParams() throws RemoteException {
+        return taskRepository.getAllParams();
     }
 }
