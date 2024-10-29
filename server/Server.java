@@ -73,36 +73,32 @@ public class Server extends UnicastRemoteObject implements TaskManager {
         System.out.println("Worker " + Thread.currentThread().getId() + " finished processing a task\n");
     }
 
+    @Override
+    public void deleteResult(int param, Callback callback) throws RemoteException {
+        taskRepository.deleteResultByParam(param);
+        callback.alert("Le résultat avec le paramètre " + param + " a été supprimé.");
+    }
+
+    @Override
+    public void getResultByParam(int param, Callback callback) throws RemoteException {
+        if (!taskRepository.isParamExists(param)) {
+            callback.alert("Le paramètre " + param + " n'existe pas.");
+            return;
+        }
+
+        String completeInfo = taskRepository.getCompleteTaskInfoByParam(param);
+        callback.alert(completeInfo);
+        System.out.println("Le client a été notifié !!!");
+    }
+
     public void shutdown() {
         workerPool.shutdown();
         System.out.println("Server is shutting down...");
     }
 
     @Override
-    public String getResultDetails(int id) throws RemoteException {
-        return taskRepository.getCompleteTaskInfoById(id);
-    }
-
-    @Override
-    public void deleteResult(int id) throws RemoteException {
-        throw new UnsupportedOperationException("Unimplemented method 'deleteResult'");
-    }
-
-    @Override
-    public List<Integer> listAllIds() throws RemoteException {
-        return taskRepository.getAllTaskIds();
-    }
-
-    @Override
     public List<Integer> listAllParams() throws RemoteException {
         return taskRepository.getAllParams();
-    }
-
-    @Override
-    public void deleteResult(int param, Callback callback) throws RemoteException {
-        // Appeler le repository pour supprimer les résultats
-        taskRepository.deleteResultByParam(param);
-        callback.alert("Le résultat avec le paramètre " + param + " a été supprimé.");
     }
 
 }

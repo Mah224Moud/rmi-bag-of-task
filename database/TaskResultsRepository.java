@@ -46,48 +46,6 @@ public class TaskResultsRepository {
         }
     }
 
-    private String getResultById(int id) {
-        String sql = "SELECT TASK_NAME, PARAM, DESCRIPTION, DATE_CREATED FROM TASK_RESULTS WHERE ID = ?";
-        try (Connection conn = DatabaseHelper.connectToEluard();
-                PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, id);
-            ResultSet rs = pstmt.executeQuery();
-
-            if (rs.next()) {
-                String taskName = rs.getString("TASK_NAME");
-                int param = rs.getInt("PARAM");
-                String description = rs.getString("DESCRIPTION");
-
-                return "Tâche: " + taskName + " | Paramètre: " + param + " | Description: " + description;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return "Aucun résultat trouvé pour l'id: " + id;
-    }
-
-    private String getFibonacciSequenceById(int id) {
-        String sql = "SELECT RESULT FROM FIBONACCI_SEQUENCE WHERE ID = ?";
-        try (Connection conn = DatabaseHelper.connectToButor();
-                PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, id);
-            ResultSet rs = pstmt.executeQuery();
-
-            if (rs.next()) {
-                return rs.getString("RESULT");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return "Aucune suite Fibonacci trouvée pour l'id: " + id;
-    }
-
-    public String getCompleteTaskInfoById(int id) {
-        String taskInfo = getResultById(id);
-        String sequenceInfo = getFibonacciSequenceById(id);
-        return taskInfo + " ==> La suite de Fibonacci: " + sequenceInfo;
-    }
-
     public List<Integer> getAllTaskIds() {
         List<Integer> ids = new ArrayList<>();
 
@@ -168,21 +126,6 @@ public class TaskResultsRepository {
         }
     }
 
-    public int getTaskIdByParam(int param) {
-        String sql = "SELECT ID FROM TASK_RESULTS WHERE PARAM = ?";
-        try (Connection conn = DatabaseHelper.connectToEluard();
-                PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, param);
-            ResultSet rs = pstmt.executeQuery();
-            if (rs.next()) {
-                return rs.getInt("ID");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return -1;
-    }
-
     public List<Integer> getAllParams() {
         List<Integer> params = new ArrayList<>();
         String sql = "SELECT PARAM FROM TASK_RESULTS";
@@ -201,7 +144,6 @@ public class TaskResultsRepository {
     }
 
     public void deleteResultByParam(int param) {
-        // Récupérer l'ID du paramètre à supprimer
         String sqlGetId = "SELECT ID FROM TASK_RESULTS WHERE PARAM = ?";
         int taskId = -1;
 
@@ -216,7 +158,6 @@ public class TaskResultsRepository {
             e.printStackTrace();
         }
 
-        // Supprimer le résultat dans butor
         if (taskId != -1) {
             String sqlDeleteButor = "DELETE FROM FIBONACCI_SEQUENCE WHERE ID = ?";
             try (Connection conn = DatabaseHelper.connectToButor();
@@ -228,7 +169,6 @@ public class TaskResultsRepository {
                 e.printStackTrace();
             }
 
-            // Supprimer le résultat dans eluard
             String sqlDeleteEluard = "DELETE FROM TASK_RESULTS WHERE ID = ?";
             try (Connection conn = DatabaseHelper.connectToEluard();
                     PreparedStatement pstmt = conn.prepareStatement(sqlDeleteEluard)) {
@@ -241,6 +181,66 @@ public class TaskResultsRepository {
         } else {
             System.out.println("Aucun enregistrement trouvé avec le paramètre: " + param);
         }
+    }
+
+    public String getCompleteTaskInfoByParam(int param) {
+        String taskInfo = getResultByParam(param);
+        String sequenceInfo = getFibonacciSequenceByParam(param);
+        return taskInfo + " ==> La suite de Fibonacci: " + sequenceInfo;
+    }
+
+    private String getFibonacciSequenceByParam(int param) {
+        String sqlGetId = "SELECT ID FROM TASK_RESULTS WHERE PARAM = ?";
+        int taskId = -1;
+
+        try (Connection conn = DatabaseHelper.connectToEluard();
+                PreparedStatement pstmt = conn.prepareStatement(sqlGetId)) {
+            pstmt.setInt(1, param);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                taskId = rs.getInt("ID");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        if (taskId == -1) {
+            return "Aucun enregistrement trouvé pour le paramètre: " + param;
+        }
+
+        String sql = "SELECT RESULT FROM FIBONACCI_SEQUENCE WHERE ID = ?";
+        try (Connection conn = DatabaseHelper.connectToButor();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, taskId);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getString("RESULT");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "Aucune suite Fibonacci trouvée pour le paramètre: " + param;
+    }
+
+    public String getResultByParam(int param) {
+        String sql = "SELECT TASK_NAME, PARAM, DESCRIPTION, DATE_CREATED FROM TASK_RESULTS WHERE PARAM = ?";
+        try (Connection conn = DatabaseHelper.connectToEluard();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, param);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                String taskName = rs.getString("TASK_NAME");
+                int paramValue = rs.getInt("PARAM");
+                String description = rs.getString("DESCRIPTION");
+
+                return "Tâche: " + taskName + " | Paramètre: " + paramValue + " | Description: " + description;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "Aucun résultat trouvé pour le paramètre: " + param;
     }
 
 }

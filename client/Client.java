@@ -62,6 +62,7 @@ public class Client {
                 break;
             case 5:
                 System.out.println("Fermeture du client.");
+                System.exit(0);
                 return false;
             default:
                 System.out.println("Option invalide. Veuillez réessayer.");
@@ -84,12 +85,17 @@ public class Client {
 
     private static void consultResult() {
         try {
-            List<Integer> ids = server.listAllIds();
-            System.out.println("IDs disponibles : " + ids);
-            System.out.print("Entrez l'ID du résultat à consulter : ");
-            int id = scanner.nextInt();
-            String resultDetails = server.getResultDetails(id);
-            System.out.println(resultDetails);
+            List<Integer> params = server.listAllParams();
+            System.out.println("Paramètres calculés : " + params);
+            System.out.print("Entrez le paramètre du résultat à consulter : ");
+            int param = scanner.nextInt();
+
+            if (!params.contains(param)) {
+                System.out.println("Le paramètre " + param + " n'existe pas.");
+                return;
+            }
+
+            server.getResultByParam(param, new CallbackImpl());
         } catch (Exception e) {
             System.out.println("Erreur lors de la consultation du résultat.");
             e.printStackTrace();
