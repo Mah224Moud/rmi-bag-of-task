@@ -25,7 +25,7 @@ puis username et mdp sont login
 Pour lancer le projet
 
 ```bash
-javac -cp ojdbc8.jar:. interfaces/*.java server/*.java worker/*.java client/*.java tasks/*.java
+javac -cp ojdbc8.jar:. interfaces/*.java server/*.java worker/*.java client/*.java tasks/*.java database/*.java;
 ```
 
 ## server
