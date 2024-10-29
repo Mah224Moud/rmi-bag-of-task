@@ -105,4 +105,21 @@ public class TaskResultsRepository {
         return ids;
     }
 
+    public boolean isParamExists(int param) {
+        String sql = "SELECT COUNT(*) FROM TASK_RESULTS WHERE PARAM = ?";
+        try (Connection conn = DatabaseHelper.connectToEluard();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, param);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                int count = rs.getInt(1);
+                return count > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 }

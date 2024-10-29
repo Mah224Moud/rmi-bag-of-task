@@ -37,13 +37,20 @@ public class Server extends UnicastRemoteObject implements TaskManager {
 
                 int param = ((FibonacciTask) task).getParam();
                 String description = ((FibonacciTask) task).getDescription();
-                int taskId = taskRepository.saveResult(task.getClass().getSimpleName(), param, description);
 
-                taskRepository.saveFibonacciSequence(taskId, fibonacciSequence);
+                if (taskRepository.isParamExists(param)) {
+                    callback.alert("Les " + param + " premiers nombres de Fibo ont déja été calculés");
+                    callback.notify(result);
+                } else {
+                    int taskId = taskRepository.saveResult(task.getClass().getSimpleName(), param, description);
 
-                callback.notify(result);
-                System.out.println("The client is been notified !!!");
-                System.out.println("Worker " + Thread.currentThread().getId() + " finished processing a task\n\n");
+                    taskRepository.saveFibonacciSequence(taskId, fibonacciSequence);
+
+                    callback.notify(result);
+                }
+                System.out.println("Le client a été notifié !!!");
+
+                System.out.println("Worker " + Thread.currentThread().getId() + " finished processing a task\n");
             } catch (Exception e) {
                 e.printStackTrace();
             }

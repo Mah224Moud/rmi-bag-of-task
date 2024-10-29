@@ -17,4 +17,9 @@ public class CallbackImpl extends UnicastRemoteObject implements Callback {
         System.out.println("Result received from the server: " + result);
     }
 
+    @Override
+    public void alert(String msg) throws RemoteException {
+        System.out.println(msg);
+    }
+
 }
